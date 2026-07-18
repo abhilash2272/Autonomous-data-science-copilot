@@ -12,6 +12,7 @@ Each repair iteration:
 """
 
 import os
+import sys
 from rag.retriever import retrieve_documentation
 from agent.executor import repair_code
 from utils.token_tracker import UsageInfo
@@ -41,7 +42,11 @@ def self_heal_loop(
     """
 
     def _log(attempt: int, msg: str):
-        print(f"  [Heal attempt {attempt}] {msg}")
+        _m = f"  [Heal attempt {attempt}] {msg}"
+        try:
+            print(_m)
+        except UnicodeEncodeError:
+            print(_m.encode(sys.stdout.encoding or "utf-8", errors="replace").decode(sys.stdout.encoding or "utf-8"))
         if status_callback:
             status_callback(attempt, msg)
 

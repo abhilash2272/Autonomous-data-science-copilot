@@ -58,25 +58,58 @@ def _validate_question(question: str, df: pd.DataFrame) -> str | None:
         "trend", "outlier", "box", "bar", "histogram", "scatter",
         "top", "highest", "lowest", "group", "compare", "column",
         "row", "dataset", "data", "all", "each", "per", "by",
+        # additional query starters that are always analytical
+        "how", "what", "which", "when", "where", "who",
+        "price", "value", "total", "list", "find", "get",
+        "predict", "forecast", "analyse", "analyze", "calculate",
     ]
     if any(kw in q_lower for kw in generic_keywords):
         return None   # looks like a valid analytical query
 
-    # Extract candidate named entities: quoted strings + Title Case words
-    quoted   = re.findall(r'["\']([^"\']+)["\']', question)
-    titled   = re.findall(r'\b[A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})+\b', question)
-    entities = list({e.strip() for e in quoted + titled if len(e.strip()) > 2})
-
-    if not entities:
-        return None   # no specific entity detected
-
     # Build a search corpus: column names + all string-column values (sample)
-    col_names = " ".join(df.columns.tolist()).lower()
-    str_cols  = df.select_dtypes(include=["object", "string"]).head(200)
+    col_names  = " ".join(df.columns.tolist()).lower()
+    str_cols   = df.select_dtypes(include=["object", "string"]).head(200)
     col_values = " ".join(
         str_cols.values.flatten().astype(str).tolist()
     ).lower()
     corpus = col_names + " " + col_values
+
+    # --- Entity extraction ---
+    # 1. Quoted strings  →  'John Smith'  or  "Widget A"
+    quoted = re.findall(r'["\']([^"\']+)["\']', question)
+    # 2. Title Case multi-word  →  Boddupally Bhanu
+    titled = re.findall(r'\b[A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})+\b', question)
+    entities = list({e.strip() for e in quoted + titled if len(e.strip()) > 2})
+
+    # 3. Lowercase bigrams of non-stopword words  →  catches "shikhar dhawan"
+    _STOPS = {
+        "the","a","an","is","are","was","were","be","been","being",
+        "have","has","had","do","does","did","will","would","shall",
+        "should","may","might","must","can","could","and","or","but",
+        "in","on","at","to","of","for","with","by","from","up",
+        "out","off","over","under","between","among","through",
+        "about","around","into","onto","how","what","when","where",
+        "who","which","why","that","this","these","those",
+        "i","you","he","she","it","we","they","me","him","her",
+        "us","them","my","your","his","its","our","their",
+        "much","many","more","most","some","any","all","both","each",
+        "few","less","little","own","same","too","very","just",
+        "than","then","there","here","not","no","nor","so","yet",
+        "either","neither","because","since","while","if","unless",
+        "until","whether","before","after","as","like","such",
+        "its","also","only","tell","give","show","find","get",
+    }
+    _words = re.findall(r'\b[a-z]+\b', q_lower)
+    for _i in range(len(_words) - 1):
+        _w1, _w2 = _words[_i], _words[_i + 1]
+        if (_w1 not in _STOPS and _w2 not in _STOPS
+                and len(_w1) > 3 and len(_w2) > 3):
+            _bg = f"{_w1} {_w2}"
+            if _bg not in corpus:
+                entities.append(_bg)
+
+    if not entities:
+        return None   # no specific entity detected
 
     missing = []
     for entity in entities:
@@ -185,7 +218,18 @@ def run(
     final_code = code
 
     # ── 4. Self-healing loop ──────────────────────────────────────────────────
-    if not result["success"]:
+    # Semantic / logical errors (entity not in data, column missing, etc.) cannot
+    # be fixed by code repair — skip self_heal and surface the error directly.
+    _SEMANTIC_PATTERNS = [
+        "not found in the dataset", "was not found", "does not exist in column",
+        "cannot be answered", "cannot answer", "cannot filter",
+        "column not found in dataset", "not found anywhere",
+        "does not appear", "valueerror",
+    ]
+    _err_text = (result.get("error") or result.get("stderr") or "").lower()
+    _is_semantic = any(p in _err_text for p in _SEMANTIC_PATTERNS)
+
+    if not result["success"] and not _is_semantic:
         _log("HEAL", f"Execution failed: {result.get('error')}. Starting self-healing …")
         healed = True
 
@@ -208,6 +252,9 @@ def run(
         total_usage   = total_usage + heal_usage
         result        = heal_result
         final_code    = heal_result.get("repaired_code", code)
+
+    elif not result["success"] and _is_semantic:
+        _log("HEAL", f"Semantic error detected — skipping self-heal: {result.get('error', '')[:80]}")
 
     # ── 5. Generate insights ──────────────────────────────────────────────────
     insights = ""

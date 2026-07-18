@@ -73,94 +73,418 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
+/* ══ Design Tokens ═══════════════════════════════════════════════════ */
+:root {
+  /* Main canvas */
+  --bg:#080B10; --canvas:#0E1321; --surface:#171E30; --surf-2:#202A42; --surf-hi:#2A3754;
+  /* Borders */
+  --border:rgba(255,255,255,0.07); --border-hi:rgba(255,255,255,0.15);
+  /* Brand */
+  --navy:#F1F5F9; --navy-2:#E2E8F0;
+  --blue:#3B82F6; --blue-dim:rgba(59,130,246,0.08); --blue-ring:rgba(59,130,246,0.20); --blue-glow:rgba(59,130,246,0.24);
+  /* Semantic — used sparingly */
+  --success:#10B981; --success-dim:rgba(16,185,129,0.08);
+  --warning:#F59E0B; --warning-dim:rgba(245,158,11,0.08);
+  --danger:#EF4444;  --danger-dim:rgba(239,68,68,0.08);
+  /* Text scale */
+  --text:#E2E8F0; --text-2:#CBD5E1; --text-muted:#94A3B8; --text-faint:#475569;
+  /* Sidebar (stays dark) */
+  --sb-bg:#080B10; --sb-surf:#0E1321; --sb-surf-hi:#171E30;
+  --sb-border:rgba(255,255,255,0.07); --sb-bhi:rgba(255,255,255,0.13);
+  --sb-text:#E2E8F0; --sb-muted:#94A3B8; --sb-faint:#4B5E7A;
+  /* Radius */
+  --r-xs:4px; --r-sm:6px; --r:8px; --r-lg:12px; --r-xl:16px;
+  /* Elevation — 3 levels */
+  --el-flat:  0 1px 3px rgba(0,0,0,0.3),0 1px 2px rgba(0,0,0,0.2);
+  --el-raised:0 4px 16px rgba(0,0,0,0.5),0 2px 4px rgba(0,0,0,0.3);
+  --el-float: 0 12px 32px rgba(0,0,0,0.7),0 4px 8px rgba(0,0,0,0.4);
+  --el-blue:  0 4px 16px rgba(59,130,246,0.24);
+}
+
+
+/* ══ Base ════════════════════════════════════════════════════════════ */
 html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif !important;
-    background-color: #0a0d14 !important;
-    color: #e8eaf0 !important;
+  font-family:'Inter',sans-serif !important;
+  background-color:var(--bg) !important;
+  color:var(--text) !important;
+  -webkit-font-smoothing:antialiased !important;
 }
-.stApp { background: #0a0d14 !important; }
+.stApp { background:var(--bg) !important; }
+#MainMenu, footer, header { visibility:hidden; }
 
+/* ── Scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--surf-hi); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--border-hi); }
+
+/* ══ Sidebar ═════════════════════════════════════════════════════════ */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0f1420 0%, #0a0d14 100%) !important;
-    border-right: 1px solid rgba(255,255,255,0.07) !important;
+  background:var(--sb-bg) !important;
+  border-right:1px solid var(--sb-border) !important;
 }
-[data-testid="stSidebar"] * { color: #e8eaf0 !important; }
+[data-testid="stSidebar"] * { color:var(--sb-text) !important; }
+[data-testid="stSidebar"] .stMarkdown p { color:var(--sb-muted) !important; }
 
+/* Sidebar buttons — dark themed, left-aligned chips */
+[data-testid="stSidebar"] .stButton > button {
+  background:var(--sb-surf) !important;
+  color:var(--sb-text) !important;
+  border:1px solid var(--sb-border) !important;
+  border-radius:var(--r-sm) !important;
+  padding:0.45rem 0.85rem !important;
+  font-size:0.81rem !important;
+  font-weight:500 !important;
+  letter-spacing:0 !important;
+  transition:all 0.15s ease !important;
+  box-shadow:none !important;
+  text-align:left !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover {
+  background:var(--sb-surf-hi) !important;
+  border-color:rgba(45,107,255,0.45) !important;
+  color:#fff !important;
+  transform:translateX(3px) translateY(0) !important;
+  box-shadow:none !important;
+}
+[data-testid="stSidebar"] .stButton > button:active {
+  transform:translateX(2px) translateY(0) !important;
+}
+
+/* Download button in sidebar */
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button {
+  background:var(--sb-surf) !important;
+  color:var(--sb-muted) !important;
+  border:1px solid var(--sb-border) !important;
+  font-size:0.78rem !important;
+  padding:0.4rem 0.9rem !important;
+}
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button:hover {
+  background:var(--sb-surf-hi) !important;
+  border-color:var(--sb-bhi) !important;
+  color:#fff !important;
+  transform:translateX(3px) translateY(0) !important;
+}
+
+/* ══ Main area buttons ═══════════════════════════════════════════════ */
 .stButton > button {
-    width: 100%;
-    background: linear-gradient(135deg, #6c63ff 0%, #8b5cf6 100%) !important;
-    color: #fff !important; border: none !important;
-    border-radius: 10px !important; padding: 0.65rem 1.5rem !important;
-    font-weight: 600 !important; font-size: 0.95rem !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 4px 20px rgba(108,99,255,0.3) !important;
+  width:100% !important;
+  background:var(--canvas) !important;
+  color:var(--text-2) !important;
+  border:1px solid var(--border-hi) !important;
+  border-radius:var(--r) !important;
+  padding:0.55rem 1.1rem !important;
+  font-weight:500 !important;
+  font-size:0.86rem !important;
+  letter-spacing:0.01em !important;
+  transition:all 0.15s ease !important;
+  box-shadow:var(--el-flat) !important;
 }
 .stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 28px rgba(108,99,255,0.5) !important;
+  background:var(--blue-dim) !important;
+  border-color:var(--blue) !important;
+  color:var(--blue) !important;
+  box-shadow:var(--el-raised) !important;
+  transform:translateY(-1px) !important;
+}
+.stButton > button:active {
+  transform:translateY(0) !important;
+  box-shadow:var(--el-flat) !important;
 }
 
+
+
+/* ══ Inputs / Textarea ═══════════════════════════════════════════════ */
 .stTextArea textarea, .stTextInput input {
-    background: #131929 !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    border-radius: 10px !important; color: #e8eaf0 !important;
+  background:var(--canvas) !important;
+  border:1px solid var(--border-hi) !important;
+  border-radius:var(--r) !important;
+  color:var(--text) !important;
+  font-family:'Inter',sans-serif !important;
+  font-size:0.9rem !important;
+  transition:border-color 0.15s ease, box-shadow 0.15s ease !important;
+  box-shadow:var(--el-flat) !important;
 }
 .stTextArea textarea:focus, .stTextInput input:focus {
-    border-color: #6c63ff !important;
-    box-shadow: 0 0 0 2px rgba(108,99,255,0.2) !important;
+  border-color:var(--blue) !important;
+  box-shadow:0 0 0 3px var(--blue-ring) !important;
+  outline:none !important;
 }
 
+/* ══ File uploader ═══════════════════════════════════════════════════ */
 [data-testid="stFileUploadDropzone"] {
-    background: rgba(108,99,255,0.04) !important;
-    border: 2px dashed rgba(108,99,255,0.4) !important;
-    border-radius: 14px !important; transition: all 0.3s ease;
+  background:var(--canvas) !important;
+  border:2px dashed var(--border-hi) !important;
+  border-radius:var(--r-lg) !important;
+  transition:all 0.15s ease !important;
 }
 [data-testid="stFileUploadDropzone"]:hover {
-    border-color: #00d4aa !important;
-    background: rgba(0,212,170,0.04) !important;
+  border-color:var(--blue) !important;
+  background:var(--blue-dim) !important;
 }
 
-[data-testid="stMetricValue"] { color: #00d4aa !important; font-weight: 700 !important; }
-[data-testid="stMetricLabel"] { color: #8892a4 !important; font-size: 0.8rem !important; }
+/* ══ Metrics ══════════════════════════════════════════════════════════ */
+[data-testid="stMetricValue"] {
+  color:var(--navy) !important;
+  font-weight:700 !important;
+  font-size:1.35rem !important;
+  line-height:1.2 !important;
+}
+[data-testid="stMetricLabel"] {
+  color:var(--text-muted) !important;
+  font-size:0.67rem !important;
+  font-weight:600 !important;
+  letter-spacing:0.07em !important;
+  text-transform:uppercase !important;
+}
 [data-testid="metric-container"] {
-    background: #131929 !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 12px !important; padding: 0.8rem !important;
+  background:var(--canvas) !important;
+  border:1px solid var(--border) !important;
+  border-radius:var(--r) !important;
+  padding:0.85rem !important;
+  box-shadow:var(--el-flat) !important;
+  transition:box-shadow 0.15s ease, border-color 0.15s ease !important;
+}
+[data-testid="metric-container"]:hover {
+  box-shadow:var(--el-raised) !important;
+  border-color:var(--border-hi) !important;
 }
 
+/* ══ DataFrames ═══════════════════════════════════════════════════════ */
 [data-testid="stDataFrame"] {
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 12px !important;
+  border:1px solid var(--border) !important;
+  border-radius:var(--r) !important;
+  overflow:hidden !important;
+  box-shadow:var(--el-flat) !important;
 }
 
+/* ══ Tabs — underline style ══════════════════════════════════════════ */
 .stTabs [data-baseweb="tab-list"] {
-    background: #131929 !important; border-radius: 10px !important;
-    padding: 4px !important; gap: 4px !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
+  background:transparent !important;
+  border-radius:0 !important;
+  padding:0 !important;
+  gap:0 !important;
+  border:none !important;
+  border-bottom:2px solid var(--border) !important;
 }
-.stTabs [data-baseweb="tab"] { border-radius: 8px !important; color: #8892a4 !important; font-weight: 500 !important; }
-.stTabs [aria-selected="true"] { background: linear-gradient(135deg, #6c63ff, #8b5cf6) !important; color: #fff !important; }
+.stTabs [data-baseweb="tab"] {
+  border-radius:0 !important;
+  color:var(--text-muted) !important;
+  font-weight:500 !important;
+  font-size:0.86rem !important;
+  padding:0.55rem 1.1rem !important;
+  transition:color 0.15s ease !important;
+  border-bottom:2px solid transparent !important;
+  margin-bottom:-2px !important;
+  background:transparent !important;
+}
+.stTabs [data-baseweb="tab"]:hover { color:var(--navy) !important; }
+.stTabs [aria-selected="true"] {
+  background:transparent !important;
+  color:var(--blue) !important;
+  border-bottom:2px solid var(--blue) !important;
+  font-weight:600 !important;
+  box-shadow:none !important;
+}
 .stTabs [data-baseweb="tab-panel"] {
-    background: #0f1420 !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 0 0 12px 12px !important; padding: 1rem !important;
+  background:var(--canvas) !important;
+  border:1px solid var(--border) !important;
+  border-top:none !important;
+  border-radius:0 0 var(--r) var(--r) !important;
+  padding:1.25rem !important;
+  box-shadow:var(--el-flat) !important;
 }
 
-.stSuccess { background: rgba(0,212,170,0.08) !important; border-left-color: #00d4aa !important; }
-.stError   { background: rgba(255,107,107,0.08) !important; border-left-color: #ff6b6b !important; }
-.stInfo    { background: rgba(108,99,255,0.08) !important; border-left-color: #6c63ff !important; }
-.stWarning { background: rgba(255,215,0,0.08)  !important; border-left-color: #ffd700 !important; }
+/* ══ Alerts ══════════════════════════════════════════════════════════ */
+.stSuccess {
+  background:var(--success-dim) !important;
+  border:1px solid rgba(16,185,129,0.25) !important;
+  border-left:3px solid var(--success) !important;
+  border-radius:var(--r) !important;
+}
+.stError {
+  background:var(--danger-dim) !important;
+  border:1px solid rgba(239,68,68,0.25) !important;
+  border-left:3px solid var(--danger) !important;
+  border-radius:var(--r) !important;
+}
+.stInfo {
+  background:var(--blue-dim) !important;
+  border:1px solid rgba(45,107,255,0.22) !important;
+  border-left:3px solid var(--blue) !important;
+  border-radius:var(--r) !important;
+}
+.stWarning {
+  background:var(--warning-dim) !important;
+  border:1px solid rgba(245,158,11,0.25) !important;
+  border-left:3px solid var(--warning) !important;
+  border-radius:var(--r) !important;
+}
 
+/* ══ Selectbox ════════════════════════════════════════════════════════ */
 .stSelectbox [data-baseweb="select"] > div {
-    background: #131929 !important; border-color: rgba(255,255,255,0.08) !important; color: #e8eaf0 !important;
+  background:var(--canvas) !important;
+  border-color:var(--border-hi) !important;
+  border-radius:var(--r) !important;
+  color:var(--text) !important;
+  box-shadow:var(--el-flat) !important;
+  transition:border-color 0.15s ease !important;
 }
-.stProgress > div > div > div { background: linear-gradient(90deg, #6c63ff, #00d4aa) !important; }
-hr { border-color: rgba(255,255,255,0.06) !important; }
-details { background: #131929 !important; border: 1px solid rgba(255,255,255,0.06) !important; border-radius: 10px !important; }
-summary { color: #e8eaf0 !important; font-weight: 600 !important; }
-#MainMenu, footer, header { visibility: hidden; }
+.stSelectbox [data-baseweb="select"] > div:hover { border-color:var(--blue) !important; }
+
+/* ══ Slider ════════════════════════════════════════════════════════════ */
+[data-testid="stSlider"] [role="slider"] {
+  background:var(--blue) !important;
+  box-shadow:0 0 0 3px var(--blue-ring) !important;
+}
+
+/* ══ Progress ══════════════════════════════════════════════════════════ */
+.stProgress > div > div > div > div {
+  background:linear-gradient(90deg,var(--blue),var(--success)) !important;
+  border-radius:99px !important;
+}
+.stProgress > div > div > div { background:var(--surf-hi) !important; border-radius:99px !important; }
+
+/* ══ Expanders ══════════════════════════════════════════════════════ */
+details {
+  background:var(--canvas) !important;
+  border:1px solid var(--border) !important;
+  border-radius:var(--r) !important;
+  transition:border-color 0.15s ease, box-shadow 0.15s ease !important;
+  box-shadow:var(--el-flat) !important;
+}
+details:hover {
+  border-color:var(--border-hi) !important;
+  box-shadow:var(--el-raised) !important;
+}
+summary { color:var(--text-2) !important; font-weight:600 !important; font-size:0.87rem !important; cursor:pointer !important; }
+hr { border-color:var(--border) !important; margin:0.7rem 0 !important; }
+
+/* ══ Code blocks ══════════════════════════════════════════════════════ */
+.stCode, [data-testid="stCode"] {
+  background:#0D1117 !important;
+  border:1px solid #21262D !important;
+  border-radius:var(--r) !important;
+  box-shadow:var(--el-flat) !important;
+}
+.stCode code { font-family:'JetBrains Mono',monospace !important; font-size:0.81rem !important; line-height:1.65 !important; color:#E6EDF3 !important; }
+
+/* ══ Spinner ══════════════════════════════════════════════════════════ */
+[data-testid="stSpinner"] > div { border-top-color:var(--blue) !important; }
+
+/* ════════ Reusable component classes ═════════════════════════════════ */
+
+/* --- Sidebar brand header --- */
+.brand-wrap { padding:0.9rem 0 0.5rem; display:flex; align-items:center; gap:0.6rem; }
+.brand-icon {
+  font-size:1.4rem; display:flex; align-items:center; justify-content:center;
+  width:2.2rem; height:2.2rem; flex-shrink:0;
+  background:rgba(45,107,255,0.18); border-radius:var(--r);
+  border:1px solid rgba(45,107,255,0.3);
+}
+.brand-name { font-size:0.88rem; font-weight:700; color:var(--sb-text)!important; margin:0; line-height:1.25; }
+.brand-sub  { font-size:0.63rem; color:var(--sb-faint)!important; margin:2px 0 0; }
+
+/* --- Sidebar section label --- */
+.sb-label {
+  font-size:0.59rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--sb-faint)!important; display:block;
+  padding:0.55rem 0 0.25rem; margin-top:0.1rem;
+  border-top:1px solid var(--sb-border);
+}
+
+/* --- Sidebar KB status pill --- */
+.kb-status {
+  display:inline-flex; align-items:center; gap:5px; font-size:0.66rem;
+  color:var(--sb-muted)!important; background:var(--sb-surf);
+  border-radius:99px; padding:3px 10px; border:1px solid var(--sb-border);
+  transition:border-color 0.15s ease;
+}
+.kb-dot { width:6px; height:6px; border-radius:50%; background:var(--success); display:inline-block; flex-shrink:0; }
+
+/* --- Sidebar footer --- */
+.sb-footer { padding:0.7rem 0 0.4rem; border-top:1px solid var(--sb-border); text-align:center; margin-top:0.3rem; }
+.sb-footer p { font-size:0.62rem; color:var(--sb-faint)!important; margin:3px 0; }
+
+/* --- History card --- */
+.hist-card {
+  background:var(--sb-surf); border:1px solid var(--sb-border); border-radius:var(--r-sm);
+  padding:0.5rem 0.72rem; margin-bottom:0.28rem;
+  transition:border-color 0.15s ease, background 0.15s ease;
+}
+.hist-card:hover { background:var(--sb-surf-hi); border-color:var(--sb-bhi); }
+.hist-time { font-size:0.63rem; color:var(--sb-faint)!important; }
+.hist-q    { font-size:0.78rem; color:var(--sb-text)!important; margin-top:2px; line-height:1.35; }
+
+/* --- Page hero header --- */
+.page-header { padding:0.25rem 0 0.9rem; border-bottom:1px solid var(--border); margin-bottom:0.5rem; }
+.page-title {
+  font-size:1.3rem; font-weight:800; color:var(--navy);
+  letter-spacing:-0.02em; margin:0 0 0.2rem; line-height:1.2;
+}
+.page-sub { color:var(--text-muted); font-size:0.84rem; margin:0 0 0.65rem; }
+
+/* --- Tech badge (uniform enterprise style) --- */
+.tech-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 10px; border-radius:var(--r-sm); font-size:0.71rem; font-weight:500;
+  margin-right:5px; background:var(--surface); color:var(--text-muted);
+  border:1px solid var(--border); letter-spacing:0.02em;
+  transition:border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.tech-badge:hover { border-color:var(--blue); color:var(--blue); background:var(--blue-dim); }
+
+/* --- Section label (main area) --- */
+.section-lbl {
+  font-size:0.67rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--text-muted); display:block; margin-bottom:0.4rem;
+}
+
+/* --- Stdout / preformatted output --- */
+.output-pre {
+  background:#0D1117; border:1px solid #21262D; border-radius:var(--r);
+  padding:1rem 1.2rem; font-family:'JetBrains Mono',monospace;
+  font-size:0.8rem; color:#E6EDF3; white-space:pre-wrap;
+  overflow-x:auto; line-height:1.65; margin-top:0.5rem;
+  box-shadow:var(--el-flat);
+}
+
+/* --- Empty-state panel --- */
+@keyframes float-up { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.ready-wrap {
+  background:var(--canvas); border:1px solid var(--border);
+  border-radius:var(--r-xl); padding:3rem 2rem; text-align:center;
+  box-shadow:var(--el-flat); margin-top:0.75rem;
+}
+.ready-icon-wrap {
+  font-size:2.2rem; animation:float-up 3s ease-in-out infinite;
+  display:inline-flex; align-items:center; justify-content:center;
+  width:4rem; height:4rem;
+  background:var(--blue-dim); border-radius:var(--r-lg);
+  border:1px solid rgba(45,107,255,0.2); margin-bottom:0.75rem;
+}
+
+.ready-title { font-size:1.15rem; font-weight:700; color:var(--navy); margin:0 0 0.35rem; }
+.ready-sub   { color:var(--text-muted); font-size:0.85rem; margin:0 0 1.6rem; line-height:1.5; }
+.steps-row { display:flex; justify-content:center; gap:0.8rem; flex-wrap:wrap; }
+.step-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  padding:1.2rem 0.9rem; min-width:95px; flex:1; max-width:125px; text-align:center;
+  transition:border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.step-card:hover {
+  border-color:var(--blue);
+  box-shadow:0 8px 24px rgba(45, 107, 255, 0.08);
+  transform:translateY(-2px);
+}
+.step-n    { font-size:0.57rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.4rem; }
+.step-icon { font-size:1.3rem; margin-bottom:0.3rem; }
+.step-lbl  { font-size:0.75rem; font-weight:600; color:var(--text-2); }
+
 </style>
 """, unsafe_allow_html=True)
+
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -170,17 +494,17 @@ with st.sidebar:
 
     # ── Branding ─────────────────────────────────────────────────────
     st.markdown(
-        '<div style="text-align:center;padding:0.5rem 0 0.2rem;">'
-        '<span style="font-size:2rem;">🤖</span>'
-        '<h2 style="margin:0.2rem 0 0;font-size:1.1rem;font-weight:700;">Data Science Co-Pilot</h2>'
-        '<p style="margin:0;font-size:0.75rem;color:#8892a4;">Groq · LangChain · ChromaDB RAG</p>'
-        '</div>',
+        '<div class="brand-wrap">'
+        '<div class="brand-icon">🤖</div>'
+        '<div>'
+        '<p class="brand-name">Data Science Co-Pilot</p>'
+        '<p class="brand-sub">AI-powered analytics</p>'
+        '</div></div>',
         unsafe_allow_html=True,
     )
-    st.divider()
 
     # ── Settings ─────────────────────────────────────────────────────
-    st.markdown("### ⚙️ Settings")
+    st.markdown('<span class="sb-label">⚙️ Settings</span>', unsafe_allow_html=True)
     model = st.selectbox(
         "LLM Model",
         ["llama-3.3-70b-versatile", "llama3-70b-8192", "llama3-8b-8192",
@@ -196,7 +520,7 @@ with st.sidebar:
     st.divider()
 
     # ── Sample / Dynamic Questions ──────────────────────────────────────
-    st.markdown("### 💡 Sample Questions")
+    st.markdown('<span class="sb-label">💡 Sample Questions</span>', unsafe_allow_html=True)
 
     if st.session_state.df is not None and st.session_state.dynamic_questions:
         q_list  = st.session_state.dynamic_questions
@@ -243,20 +567,19 @@ with st.sidebar:
     st.divider()
 
     # ── Analysis History ──────────────────────────────────────────
-    st.markdown("### 📋 History")
+    st.markdown('<span class="sb-label">📋 History</span>', unsafe_allow_html=True)
     if not st.session_state.history:
         st.caption("_No analyses yet. Run your first query._")
     else:
         for _entry in reversed(st.session_state.history[-20:]):
             _icon  = "✅" if _entry["success"] else "❌"
-            _color = "#00d4aa" if _entry["success"] else "#ff6b6b"
+            _color = "#10B981" if _entry["success"] else "#EF4444"
             _short = _entry["question"][:55] + ("…" if len(_entry["question"]) > 55 else "")
             st.markdown(
-                f'<div style="background:#131929;border:1px solid rgba(255,255,255,0.06);'
-                f'border-radius:10px;padding:0.55rem 0.75rem;margin-bottom:0.4rem;">'
-                f'<span style="font-size:0.68rem;color:#8892a4;">{_entry["time"]}</span><br/>'
-                f'<span style="color:{_color};font-weight:600;">{_icon} </span>'
-                f'<span style="font-size:0.82rem;color:#e8eaf0;">{_short}</span>'
+                f'<div class="hist-card">'
+                f'<div class="hist-time">{_entry["time"]} — '
+                f'<span style="color:{_color};font-weight:600;">{_icon}</span></div>'
+                f'<div class="hist-q">{_short}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
@@ -271,24 +594,30 @@ with st.sidebar:
             use_container_width=True,
         )
 
-    st.divider()
-    st.caption("📄 CSV  |  📊 Excel (.xlsx)  |  🗂 JSON")
-    st.caption("🌐 Internet connection required")
+    st.markdown(
+        '<div class="sb-footer">'
+        '<span class="kb-status"><span class="kb-dot"></span> Knowledge base ready</span>'
+        '<p style="margin-top:0.45rem;">Accepts CSV · Excel · JSON</p>'
+        '<p>Powered by Groq &amp; ChromaDB</p>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Hero
 # ─────────────────────────────────────────────────────────────────────────────
-st.markdown("## 🤖 Autonomous Data Science Co-Pilot")
-st.caption("Upload data · Ask questions in plain English · Get professional charts, insights & reports — **zero code required**")
 st.markdown(
-    '<span style="background:rgba(108,99,255,0.15);color:#6c63ff;border:1px solid rgba(108,99,255,0.35);border-radius:20px;padding:3px 12px;font-size:0.78rem;font-weight:600;margin-right:6px;">Groq LLM</span>'
-    '<span style="background:rgba(0,212,170,0.15);color:#00d4aa;border:1px solid rgba(0,212,170,0.35);border-radius:20px;padding:3px 12px;font-size:0.78rem;font-weight:600;margin-right:6px;">LangChain</span>'
-    '<span style="background:rgba(255,215,0,0.15);color:#ffd700;border:1px solid rgba(255,215,0,0.35);border-radius:20px;padding:3px 12px;font-size:0.78rem;font-weight:600;margin-right:6px;">ChromaDB RAG</span>'
-    '<span style="background:rgba(255,107,107,0.15);color:#ff6b6b;border:1px solid rgba(255,107,107,0.35);border-radius:20px;padding:3px 12px;font-size:0.78rem;font-weight:600;">Self-Healing</span>',
+    '<div class="page-header">'
+    '<p class="page-title">🤖 Autonomous Data Science Co-Pilot</p>'
+    '<p class="page-sub">Upload data · Ask questions in plain English · Get professional charts, insights &amp; reports — zero code required</p>'
+    '<span class="tech-badge">⚡ Groq LLM</span>'
+    '<span class="tech-badge">🔗 LangChain</span>'
+    '<span class="tech-badge">🗄 ChromaDB RAG</span>'
+    '<span class="tech-badge">🔧 Self-Healing</span>'
+    '</div>',
     unsafe_allow_html=True,
 )
-st.divider()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Two-column layout
@@ -323,17 +652,10 @@ with left_col:
         meta = st.session_state.metadata
         st.divider()
         st.subheader("📊 Dataset Overview")
-        c1, c2 = st.columns(2)
+        c1, c2, c3 = st.columns(3)
         c1.metric("Rows",    f"{meta['rows']:,}")
         c2.metric("Columns", meta["cols"])
-        st.markdown(
-            f'<div style="background:#131929;border:1px solid rgba(255,255,255,0.06);'
-            f'border-radius:12px;padding:0.8rem 1rem;margin-top:0.4rem;">'
-            f'<span style="color:#8892a4;font-size:0.8rem;">File Size</span><br/>'
-            f'<span style="color:#00d4aa;font-size:1.3rem;font-weight:700;">{meta["size_kb"]} KB</span>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
+        c3.metric("Size",    f"{meta['size_kb']} KB")
 
         with st.expander("🔍 Preview (first 10 rows)"):
             st.dataframe(st.session_state.df.head(10), use_container_width=True)
@@ -377,17 +699,9 @@ with left_col:
                 st.rerun()
 
         if st.session_state.dynamic_questions:
-            _colors = [
-                ("#6c63ff", "rgba(108,99,255,0.12)", "rgba(108,99,255,0.35)"),
-                ("#00d4aa", "rgba(0,212,170,0.10)",  "rgba(0,212,170,0.35)"),
-                ("#ffd700", "rgba(255,215,0,0.10)",  "rgba(255,215,0,0.35)"),
-                ("#ff6b6b", "rgba(255,107,107,0.10)","rgba(255,107,107,0.35)"),
-                ("#a78bfa", "rgba(167,139,250,0.10)","rgba(167,139,250,0.35)"),
-            ]
             for _gi, _gq in enumerate(st.session_state.dynamic_questions):
-                _tc, _bg, _bd = _colors[_gi % len(_colors)]
                 if st.button(
-                    f"{'🔹' if _gi%5==0 else '🔸' if _gi%5==1 else '💛' if _gi%5==2 else '❤️' if _gi%5==3 else '💜'} {_gq}",
+                    f"✦ {_gq}",
                     key=f"gq_{_gi}",
                     use_container_width=True,
                 ):
@@ -506,11 +820,9 @@ with right_col:
                             pass
                         if not _rendered:
                             st.markdown(
-                                f'<div style="background:#131929;border:1px solid rgba(255,255,255,0.06);'
-                                f'border-radius:10px;padding:1rem;font-family:JetBrains Mono,monospace;'
-                                f'font-size:0.85rem;color:#e8eaf0;white-space:pre-wrap;overflow-x:auto;">'
+                                f'<div class="output-pre">'
                                 + _raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-                                + "</div>",
+                                + '</div>',
                                 unsafe_allow_html=True,
                             )
                     if not shown:
@@ -544,21 +856,32 @@ with right_col:
 
     elif not analyse_clicked:
         st.markdown(
-            '<div style="background:linear-gradient(135deg,rgba(108,99,255,0.08),rgba(0,212,170,0.04));'
-            'border:1px solid rgba(108,99,255,0.2);border-radius:16px;padding:2rem;text-align:center;margin-top:1rem;">'
-            '<div style="font-size:2.5rem;margin-bottom:0.5rem;">🤖</div>'
-            '<h3 style="color:#e8eaf0;margin:0 0 0.5rem;">Ready to Analyse</h3>'
-            '<p style="color:#8892a4;margin:0 0 1.5rem;font-size:0.95rem;">'
-            'Upload a dataset, type your question, then click <strong style="color:#6c63ff;">🚀 Analyse</strong></p>'
-            '<div style="display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;">'
-            '<div style="background:rgba(108,99,255,0.12);border:1px solid rgba(108,99,255,0.25);border-radius:12px;padding:0.8rem 1.2rem;min-width:120px;">'
-            '<div style="font-size:1.4rem;">📂</div><div style="color:#a78bfa;font-size:0.82rem;font-weight:600;margin-top:4px;">Upload Data</div></div>'
-            '<div style="background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.25);border-radius:12px;padding:0.8rem 1.2rem;min-width:120px;">'
-            '<div style="font-size:1.4rem;">💬</div><div style="color:#00d4aa;font-size:0.82rem;font-weight:600;margin-top:4px;">Ask Question</div></div>'
-            '<div style="background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:0.8rem 1.2rem;min-width:120px;">'
-            '<div style="font-size:1.4rem;">⚡</div><div style="color:#ffd700;font-size:0.82rem;font-weight:600;margin-top:4px;">AI Analyses</div></div>'
-            '<div style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.25);border-radius:12px;padding:0.8rem 1.2rem;min-width:120px;">'
-            '<div style="font-size:1.4rem;">📈</div><div style="color:#ff6b6b;font-size:0.82rem;font-weight:600;margin-top:4px;">Get Insights</div></div>'
-            '</div></div>',
+            '<div class="ready-wrap">'
+            '<div class="ready-icon-wrap">🤖</div>'
+            '<p class="ready-title">Ready to Analyse</p>'
+            '<p class="ready-sub">Upload a dataset, ask a question in plain English,<br>then hit <strong style="color:#2D6BFF;">🚀 Analyse</strong> — AI does the rest.</p>'
+            '<div class="steps-row">'
+
+            '<div class="step-card">'
+            '<div class="step-n" style="color:#2D6BFF;">Step 1</div>'
+            '<div class="step-icon">📂</div>'
+            '<div class="step-lbl">Upload Data</div>'
+            '</div>'
+
+            '<div class="step-card">'
+            '<div class="step-n" style="color:#10B981;">Step 2</div>'
+            '<div class="step-icon">💬</div>'
+            '<div class="step-lbl">Ask a Question</div>'
+            '</div>'
+
+            '<div class="step-card">'
+            '<div class="step-n" style="color:#F59E0B;">Step 3</div>'
+            '<div class="step-icon">📈</div>'
+            '<div class="step-lbl">Get Insights</div>'
+            '</div>'
+
+            '</div>'
+            '</div>',
             unsafe_allow_html=True,
         )
+
