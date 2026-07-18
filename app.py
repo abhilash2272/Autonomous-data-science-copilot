@@ -110,7 +110,18 @@ html, body, [class*="css"] {
   -webkit-font-smoothing:antialiased !important;
 }
 .stApp { background:var(--bg) !important; }
-#MainMenu, footer, header { visibility:hidden; }
+#MainMenu, footer { visibility:hidden; }
+[data-testid="stHeader"] { background:transparent !important; }
+/* Ensure collapsed sidebar toggle button is always prominently visible and interactive */
+[data-testid="collapsedControl"] {
+  visibility:visible !important; display:flex !important;
+  z-index:100000 !important; background:var(--surface) !important;
+  border:1px solid var(--border-hi) !important; border-radius:var(--r) !important;
+  padding:4px !important; margin:10px !important; box-shadow:var(--el-raised) !important;
+}
+[data-testid="collapsedControl"] * { visibility:visible !important; color:var(--navy) !important; }
+[data-testid="collapsedControl"]:hover { background:var(--blue) !important; border-color:var(--blue) !important; }
+[data-testid="collapsedControl"]:hover * { color:#fff !important; }
 
 /* ── Scrollbar ────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width:5px; height:5px; }
@@ -326,11 +337,27 @@ html, body, [class*="css"] {
   background:var(--canvas) !important;
   border-color:var(--border-hi) !important;
   border-radius:var(--r) !important;
-  color:var(--text) !important;
+  color:var(--navy) !important;
+  font-weight:500 !important;
   box-shadow:var(--el-flat) !important;
   transition:border-color 0.15s ease !important;
 }
 .stSelectbox [data-baseweb="select"] > div:hover { border-color:var(--blue) !important; }
+/* Dropdown popover and option list styling */
+[data-baseweb="popover"], [data-baseweb="menu"], [role="listbox"] {
+  background:var(--surface) !important;
+  border:1px solid var(--border-hi) !important;
+  border-radius:var(--r) !important;
+}
+[role="option"] {
+  color:var(--text) !important;
+  background:var(--surface) !important;
+  font-size:0.88rem !important;
+}
+[role="option"]:hover, [role="option"][aria-selected="true"] {
+  background:var(--blue-dim) !important;
+  color:var(--blue) !important;
+}
 
 /* ══ Slider ════════════════════════════════════════════════════════════ */
 [data-testid="stSlider"] [role="slider"] {
