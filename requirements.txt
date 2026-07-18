@@ -1,0 +1,40 @@
+# ── Core Framework ─────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+python-dotenv>=1.0.0
+
+# ── LLM / Agent ────────────────────────────────────────────────────────────────
+langchain>=0.2.0
+langchain-core>=0.2.0
+langchain-text-splitters>=0.2.0
+langchain-groq>=0.1.0
+langchain-community>=0.2.0
+groq>=0.9.0
+
+# ── Data Processing ─────────────────────────────────────────────────────────────
+pandas>=2.2.0
+numpy>=1.26.0
+openpyxl>=3.1.0
+
+# ── Visualization ───────────────────────────────────────────────────────────────
+matplotlib>=3.8.0
+seaborn>=0.13.0
+plotly>=5.22.0
+
+# ── Vector Database & RAG ───────────────────────────────────────────────────────
+chromadb>=0.5.0
+langchain-chroma>=0.1.0
+
+# ── Embeddings ──────────────────────────────────────────────────────────────────
+sentence-transformers>=3.0.0
+
+# ── Document Loading ────────────────────────────────────────────────────────────
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+lxml>=5.2.0
+
+# ── Image Export & Display ────────────────────────────────────────────────────────
+kaleido>=0.2.1       # Plotly static image export (PNG)
+Pillow>=10.3.0       # Streamlit st.image() display
+
+# ── Utilities ────────────────────────────────────────────────────────────────────
+tenacity>=8.3.0
