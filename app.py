@@ -242,8 +242,8 @@ html, body, [class*="css"] {
   line-height:1.2 !important;
 }
 [data-testid="stMetricLabel"] {
-  color:var(--text-muted) !important;
-  font-size:0.67rem !important;
+  color:var(--text-2) !important;
+  font-size:0.78rem !important;
   font-weight:600 !important;
   letter-spacing:0.07em !important;
   text-transform:uppercase !important;
@@ -337,10 +337,17 @@ html, body, [class*="css"] {
   background:var(--canvas) !important;
   border-color:var(--border-hi) !important;
   border-radius:var(--r) !important;
-  color:var(--navy) !important;
+  color:var(--text) !important;
   font-weight:500 !important;
   box-shadow:var(--el-flat) !important;
   transition:border-color 0.15s ease !important;
+}
+.stSelectbox [data-baseweb="select"] span,
+.stSelectbox [data-baseweb="select"] [data-testid="stSelectboxVirtualFocusContainer"],
+.stSelectbox [data-baseweb="select"] [role="button"],
+.stSelectbox [data-baseweb="select"] div {
+  color:var(--text) !important;
+  background-color:transparent !important;
 }
 .stSelectbox [data-baseweb="select"] > div:hover { border-color:var(--blue) !important; }
 /* Dropdown popover and option list styling */
@@ -410,12 +417,12 @@ hr { border-color:var(--border) !important; margin:0.7rem 0 !important; }
   border:1px solid rgba(45,107,255,0.3);
 }
 .brand-name { font-size:0.88rem; font-weight:700; color:var(--sb-text)!important; margin:0; line-height:1.25; }
-.brand-sub  { font-size:0.63rem; color:var(--sb-faint)!important; margin:2px 0 0; }
+.brand-sub  { font-size:0.72rem; color:var(--sb-muted)!important; margin:2px 0 0; }
 
 /* --- Sidebar section label --- */
 .sb-label {
-  font-size:0.59rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;
-  color:var(--sb-faint)!important; display:block;
+  font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--sb-muted)!important; display:block;
   padding:0.55rem 0 0.25rem; margin-top:0.1rem;
   border-top:1px solid var(--sb-border);
 }
@@ -431,7 +438,7 @@ hr { border-color:var(--border) !important; margin:0.7rem 0 !important; }
 
 /* --- Sidebar footer --- */
 .sb-footer { padding:0.7rem 0 0.4rem; border-top:1px solid var(--sb-border); text-align:center; margin-top:0.3rem; }
-.sb-footer p { font-size:0.62rem; color:var(--sb-faint)!important; margin:3px 0; }
+.sb-footer p { font-size:0.7rem; color:var(--sb-muted)!important; margin:3px 0; }
 
 /* --- History card --- */
 .hist-card {
@@ -440,7 +447,7 @@ hr { border-color:var(--border) !important; margin:0.7rem 0 !important; }
   transition:border-color 0.15s ease, background 0.15s ease;
 }
 .hist-card:hover { background:var(--sb-surf-hi); border-color:var(--sb-bhi); }
-.hist-time { font-size:0.63rem; color:var(--sb-faint)!important; }
+.hist-time { font-size:0.72rem; color:var(--sb-muted)!important; }
 .hist-q    { font-size:0.78rem; color:var(--sb-text)!important; margin-top:2px; line-height:1.35; }
 
 /* --- Page hero header --- */
@@ -463,7 +470,7 @@ hr { border-color:var(--border) !important; margin:0.7rem 0 !important; }
 
 /* --- Section label (main area) --- */
 .section-lbl {
-  font-size:0.67rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+  font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
   color:var(--text-muted); display:block; margin-bottom:0.4rem;
 }
 
@@ -534,8 +541,10 @@ with st.sidebar:
     st.markdown('<span class="sb-label">⚙️ Settings</span>', unsafe_allow_html=True)
     model = st.selectbox(
         "LLM Model",
-        ["llama-3.3-70b-versatile", "llama3-70b-8192", "llama3-8b-8192",
-         "mixtral-8x7b-32768", "gemma2-9b-it"],
+        [
+            "llama-3.3-70b-versatile",   # Best quality (default)
+            "llama-3.1-8b-instant",      # Fast & lightweight (alternative)
+        ],
         index=0, key="model_select",
     )
     os.environ["GROQ_MODEL"] = model
@@ -543,6 +552,28 @@ with st.sidebar:
     max_retries = st.slider("Max Self-Heal Retries", 1, 10, 5, key="max_retries_slider")
     os.environ["MAX_RETRIES"] = str(max_retries)
 
+    st.divider()
+
+    # ── Token Usage ──────────────────────────────────────────────────
+    st.markdown('<span class="sb-label">⚡ Token Usage</span>', unsafe_allow_html=True)
+    totals = tt.get_session_totals()
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Prompt", f"{totals['prompt_tokens']:,}")
+    with col2:
+        st.metric("Completion", f"{totals['completion_tokens']:,}")
+    
+    st.metric("Total Session Tokens", f"{totals['total_tokens']:,}")
+
+    if tt.has_history():
+        st.download_button(
+            label="⬇️ Download Token History (CSV)",
+            data=tt.to_csv_bytes(),
+            file_name="token_usage_history.csv",
+            mime="text/csv",
+            key="dl_tokens_btn",
+            use_container_width=True,
+        )
 
     st.divider()
 

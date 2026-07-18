@@ -206,5 +206,8 @@ No extra text."""
             if l.strip() and l.strip()[0].isdigit()
         ]
         return lines[:n] if lines else []
-    except (TokenLimitError, Exception):
+    except Exception as e:
+        import traceback
+        print("GENERATE QUESTIONS ERROR:")
+        traceback.print_exc()
         return []

@@ -224,7 +224,7 @@ def run(
         "not found in the dataset", "was not found", "does not exist in column",
         "cannot be answered", "cannot answer", "cannot filter",
         "column not found in dataset", "not found anywhere",
-        "does not appear", "valueerror",
+        "does not appear",
     ]
     _err_text = (result.get("error") or result.get("stderr") or "").lower()
     _is_semantic = any(p in _err_text for p in _SEMANTIC_PATTERNS)
